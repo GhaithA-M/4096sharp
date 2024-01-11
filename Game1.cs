@@ -17,17 +17,15 @@ namespace _4096sharp
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-
         private Texture2D tileTexture; // Texture for the tiles
         private int[,] grid; // The game grid
-
         public int tileSize = 64; // Tile size
         public int tileSpacing = 6; // Space between tiles
-
         private const int TilesToAddPerMove = 4; // Number of tiles to add after each move
-
         private bool hasWon = false;
         private bool hasLost = false;
+        private KeyboardState _previousKeyboardState;
+        private SpriteFont gameFont;
 
         protected override void Initialize()
         {
@@ -44,8 +42,6 @@ namespace _4096sharp
 
             base.Initialize();
         }
-
-        private SpriteFont gameFont;
 
         protected override void LoadContent()
         {
@@ -65,7 +61,7 @@ namespace _4096sharp
             if (state.IsKeyDown(Keys.Escape))
                 Exit();
 
-            if (state.IsKeyDown(Keys.R))
+            if (IsKeyPressed(Keys.R, state))
             {
                 ResetGame();
                 return;
@@ -76,16 +72,23 @@ namespace _4096sharp
                 return;
 
             // Movement controls
-            if (state.IsKeyDown(Keys.W) || state.IsKeyDown(Keys.Up))
+            if (IsKeyPressed(Keys.W, state) || IsKeyPressed(Keys.Up, state))
                 MoveTilesUp();
-            else if (state.IsKeyDown(Keys.S) || state.IsKeyDown(Keys.Down))
+            else if (IsKeyPressed(Keys.S, state) || IsKeyPressed(Keys.Down, state))
                 MoveTilesDown();
-            else if (state.IsKeyDown(Keys.A) || state.IsKeyDown(Keys.Left))
+            else if (IsKeyPressed(Keys.A, state) || IsKeyPressed(Keys.Left, state))
                 MoveTilesLeft();
-            else if (state.IsKeyDown(Keys.D) || state.IsKeyDown(Keys.Right))
+            else if (IsKeyPressed(Keys.D, state) || IsKeyPressed(Keys.Right, state))
                 MoveTilesRight();
 
+            _previousKeyboardState = state; // Update the previous keyboard state at the end of the method
+
             base.Update(gameTime);
+        }
+
+        private bool IsKeyPressed(Keys key, KeyboardState currentState)
+        {
+            return currentState.IsKeyDown(key) && !_previousKeyboardState.IsKeyDown(key);
         }
 
         protected override void Draw(GameTime gameTime)
