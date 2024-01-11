@@ -1,4 +1,3 @@
-
 Content/4096icon.psd
 Content/bin/DesktopGL/Content/Fonts/ClearSans-Regular.xnb
 Content/Fonts/clear-sans.zip
@@ -57,3 +56,20 @@ obj/Release/netcoreapp3.1/apphost.exe
 .vs/4096sharp/v17/.futdcache.v2
 .vs/4096sharp/DesignTimeBuild/.dtbcache.v2
 .vs/4096sharp/copilot/122114790
+bin/Release/netcoreapp3.1/runtimes/win-x86/native/soft_oal.dll
+bin/Release/netcoreapp3.1/runtimes/win-x86/native/SDL2.dll
+bin/Release/netcoreapp3.1/runtimes/win-x64/native/soft_oal.dll
+bin/Release/netcoreapp3.1/runtimes/win-x64/native/SDL2.dll
+bin/Release/netcoreapp3.1/runtimes/osx/native/libSDL2-2.0.0.dylib
+bin/Release/netcoreapp3.1/runtimes/osx/native/libopenal.1.dylib
+bin/Release/netcoreapp3.1/runtimes/linux-x64/native/libSDL2-2.0.so.0
+bin/Release/netcoreapp3.1/runtimes/linux-x64/native/libopenal.so.1
+bin/Release/netcoreapp3.1/MonoGame.Framework.dll
+bin/Release/netcoreapp3.1/Content/Fonts/ClearSans-Regular.xnb
+bin/Release/netcoreapp3.1/4096sharp.zip
+bin/Release/netcoreapp3.1/4096sharp.runtimeconfig.json
+bin/Release/netcoreapp3.1/4096sharp.runtimeconfig.dev.json
+bin/Release/netcoreapp3.1/4096sharp.pdb
+bin/Release/netcoreapp3.1/4096sharp.exe
+bin/Release/netcoreapp3.1/4096sharp.dll
+bin/Release/netcoreapp3.1/4096sharp.deps.json
