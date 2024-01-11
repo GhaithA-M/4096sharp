@@ -73,3 +73,4 @@ bin/Release/netcoreapp3.1/4096sharp.pdb
 bin/Release/netcoreapp3.1/4096sharp.exe
 bin/Release/netcoreapp3.1/4096sharp.dll
 bin/Release/netcoreapp3.1/4096sharp.deps.json
+*.vsidx
