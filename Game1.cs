@@ -8,12 +8,6 @@ namespace _4096sharp
 {
     public class Game1 : Game
     {
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
-
-        private Texture2D tileTexture; // Texture for the tiles
-        private int[,] grid; // The game grid
-
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -21,8 +15,19 @@ namespace _4096sharp
             IsMouseVisible = true;
         }
 
-        public int tileSize = 48; // Tile size
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
+
+        private Texture2D tileTexture; // Texture for the tiles
+        private int[,] grid; // The game grid
+
+        public int tileSize = 64; // Tile size
         public int tileSpacing = 6; // Space between tiles
+
+        private const int TilesToAddPerMove = 4; // Number of tiles to add after each move
+
+        private bool hasWon = false;
+        private bool hasLost = false;
 
         protected override void Initialize()
         {
@@ -57,25 +62,28 @@ namespace _4096sharp
         {
             KeyboardState state = Keyboard.GetState();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (state.IsKeyDown(Keys.Escape))
                 Exit();
 
+            if (state.IsKeyDown(Keys.R))
+            {
+                ResetGame();
+                return;
+            }
+
+            // Disable movement if the player has won or lost
+            if (hasWon || hasLost)
+                return;
+
+            // Movement controls
             if (state.IsKeyDown(Keys.W) || state.IsKeyDown(Keys.Up))
-            {
                 MoveTilesUp();
-            }
             else if (state.IsKeyDown(Keys.S) || state.IsKeyDown(Keys.Down))
-            {
                 MoveTilesDown();
-            }
             else if (state.IsKeyDown(Keys.A) || state.IsKeyDown(Keys.Left))
-            {
                 MoveTilesLeft();
-            }
             else if (state.IsKeyDown(Keys.D) || state.IsKeyDown(Keys.Right))
-            {
                 MoveTilesRight();
-            }
 
             base.Update(gameTime);
         }
@@ -87,7 +95,7 @@ namespace _4096sharp
                 return; // Exit if any essential components are null
             }
 
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.DarkGray);
             _spriteBatch.Begin();
 
             int totalGridSize = (8 * tileSize) + (7 * tileSpacing);
@@ -116,10 +124,97 @@ namespace _4096sharp
                 }
             }
 
+            if (hasWon || hasLost)
+            {
+                string endGameMessage = hasWon ? "Congratulations! You've won!" : "Game Over! No more moves available!";
+                DrawEndGameMessage(endGameMessage);
+                DrawResetButton();
+            }
+
             _spriteBatch.End();
             base.Draw(gameTime);
         }
 
+        private void CheckForWin()
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 8; y++)
+                {
+                    if (grid[x, y] == 4096) // Define which tile causes a win
+                    {
+                        hasWon = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void CheckForLoss()
+        {
+            // Check if there are any empty spaces left
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 8; y++)
+                {
+                    if (grid[x, y] == 0)
+                        return; // An empty space is found, so the game can continue
+                }
+            }
+
+            // Check if any moves are possible
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 8; y++)
+                {
+                    // Check right
+                    if (x < 7 && grid[x, y] == grid[x + 1, y])
+                        return;
+
+                    // Check down
+                    if (y < 7 && grid[x, y] == grid[x, y + 1])
+                        return;
+                }
+            }
+
+            // If no empty spaces and no possible merges, the player has lost
+            hasLost = true;
+        }
+
+        private void DrawEndGameMessage(string message)
+        {
+            Vector2 messageSize = gameFont.MeasureString(message);
+            Vector2 messagePosition = new Vector2(_graphics.PreferredBackBufferWidth / 2 - messageSize.X / 2,
+                                                  _graphics.PreferredBackBufferHeight / 2 - messageSize.Y / 2);
+
+            // Grey out the game (optional, if you want to keep the grey-out effect)
+            Texture2D overlay = new Texture2D(GraphicsDevice, 1, 1);
+            overlay.SetData(new[] { Color.White * 0.5f });
+            _spriteBatch.Draw(overlay, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
+
+            _spriteBatch.DrawString(gameFont, message, messagePosition, Color.White);
+        }
+
+        private void DrawResetButton()
+        {
+            string resetMessage = "Press 'R' to Reset";
+            Vector2 resetSize = gameFont.MeasureString(resetMessage);
+            string endGameMessage = hasWon ? "Congratulations! You've won!" : "Game Over! No more moves available!";
+            Vector2 endGameSize = gameFont.MeasureString(endGameMessage);
+
+            Vector2 resetPosition = new Vector2(_graphics.PreferredBackBufferWidth / 2 - resetSize.X / 2,
+                                                _graphics.PreferredBackBufferHeight / 2 - resetSize.Y / 2 + endGameSize.Y + 20); // Adjust Y position
+
+            _spriteBatch.DrawString(gameFont, resetMessage, resetPosition, Color.White);
+        }
+
+        private void ResetGame()
+        {
+            grid = new int[8, 8];
+            hasWon = false;
+            hasLost = false;
+            AddRandomTile(); // Start with one tile on the grid
+        }
 
         private void AddRandomTile()
         {
@@ -128,14 +223,14 @@ namespace _4096sharp
             {
                 for (int y = 0; y < 8; y++)
                 {
-                    if (grid[x, y] == 0) // 0 represents an empty tile
+                    if (grid[x, y] == 0) // Check for empty tile
                     {
                         emptyTiles.Add(new Point(x, y));
                     }
                 }
             }
 
-            if (emptyTiles.Count > 0)
+            if (emptyTiles.Count > 0) // Only add a tile if there is an empty space
             {
                 var random = new Random();
                 var randomTile = emptyTiles[random.Next(emptyTiles.Count)];
@@ -145,6 +240,7 @@ namespace _4096sharp
 
         private void MoveTilesUp()
         {
+            bool moved = false;
             for (int col = 0; col < 8; col++)
             {
                 for (int row = 1; row < 8; row++)
@@ -172,7 +268,18 @@ namespace _4096sharp
                     }
                 }
             }
-            AddRandomTile();
+
+            if (moved)
+            {
+                for (int i = 0; i < TilesToAddPerMove; i++)
+                {
+                    AddRandomTile();
+                }
+
+                CheckForWin();
+                CheckForLoss();
+            }
+
         }
 
         private void MoveTilesDown()
@@ -209,8 +316,15 @@ namespace _4096sharp
 
             if (moved)
             {
-                AddRandomTile();
+                for (int i = 0; i < TilesToAddPerMove; i++)
+                {
+                    AddRandomTile();
+                }
+
+                CheckForWin();
+                CheckForLoss();
             }
+
         }
 
         private void MoveTilesLeft()
@@ -247,8 +361,15 @@ namespace _4096sharp
 
             if (moved)
             {
-                AddRandomTile();
+                for (int i = 0; i < TilesToAddPerMove; i++)
+                {
+                    AddRandomTile();
+                }
+
+                CheckForWin();
+                CheckForLoss();
             }
+
         }
 
         private void MoveTilesRight()
@@ -285,8 +406,15 @@ namespace _4096sharp
 
             if (moved)
             {
-                AddRandomTile();
+                for (int i = 0; i < TilesToAddPerMove; i++)
+                {
+                    AddRandomTile();
+                }
+
+                CheckForWin();
+                CheckForLoss();
             }
+
         }
 
         private Color GetTileColor(int value)
@@ -308,5 +436,6 @@ namespace _4096sharp
                 _ => Color.Gray, // Default color for blank tile
             };
         }
+
     }
 }
