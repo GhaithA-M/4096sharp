@@ -1,5 +1,5 @@
 # 4096sharp
-4096sharp is challenging puzzle game inspired by the classic 2048, but with a twist. This game extends the traditional gameplay by incorporating an 8x8 grid, making it much more difficult.
+4096sharp is challenging puzzle game inspired by the classic 2048, but with a twist. This game extends the traditional gameplay by incorporating an 8x8 grid, making it much easier.
 
 ## How to Play
 Merge tiles with the same number by moving them in one of four directions (up, down, left, right). Each move adds 4 new tiles to the grid. Combine tiles to reach the 4096 tile without filling up the grid.
